@@ -7,7 +7,6 @@ int
 main(int argc, char *argv[])
 {
     printf("hello world (pid:%d)\n", (int) getpid());
-    pid_t parent = getpid();
     int rc = fork();
    
     if (rc < 0) {
@@ -17,12 +16,16 @@ main(int argc, char *argv[])
     } else if (rc == 0) {
         // child (new process)
         pid_t p = waitpid(0, NULL, WUNTRACED | WCONTINUED);
+        if ((int)p == -1) {
+            printf("wait errored\n");
+        } else { 
+            printf("process %d state changed\n", (int)p);
+        }
         printf("hello, I am child (pid:%d)\n", (int) getpid());
         sleep(2);
     } else {
         // parent goes down this path (original process)
-        int wc = wait(NULL);
-        printf("hello, I am parent of %d (pid:%d)\n", wc, (int) getpid());
+        printf("hello, I am (pid:%d)\n", (int) getpid());
     }
     return 0;
 }
